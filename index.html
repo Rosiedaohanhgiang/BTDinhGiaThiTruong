@@ -1,0 +1,1138 @@
+<!DOCTYPE html>
+<html lang="vi" class="h-full bg-primary-darkblue">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Bài Tập Tương Tác: Định Giá Thị Trường (TechGarden)</title>
+    <!-- 1. Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    
+    <!-- 2. Font 'Oswald' (Theo yêu cầu) -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Oswald:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    
+    <!-- 3. Font Awesome (Icons) -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+    
+    <style>
+        body {
+            font-family: 'Oswald', sans-serif;
+            letter-spacing: 0.025em;
+        }
+
+        /* Định nghĩa màu chủ đạo */
+        .bg-primary-orange { background-color: #FF9800; }
+        .text-primary-orange { color: #FF9800; }
+        .border-primary-orange { border-color: #FF9800; }
+        .ring-primary-orange { --tw-ring-color: #FF9800; }
+        
+        .bg-primary-green { background-color: #009688; }
+        .text-primary-green { color: #009688; }
+        .border-primary-green { border-color: #009688; }
+
+        .bg-primary-blue { background-color: #5C6BC0; }
+        .text-primary-blue { color: #5C6BC0; }
+        .border-primary-blue { border-color: #5C6BC0; }
+
+        .bg-primary-darkblue { background-color: #1a237e; }
+        .text-primary-darkblue { color: #1a237e; }
+        .border-primary-darkblue { border-color: #1a237e; }
+        
+        /* Ẩn các bước */
+        .step-content { display: none; }
+        .step-content.active { display: block; }
+        
+        /* Tùy chỉnh input number */
+        input[type="number"] { -moz-appearance: textfield; }
+        input[type="number"]::-webkit-outer-spin-button,
+        input[type="number"]::-webkit-inner-spin-button {
+            -webkit-appearance: none;
+            margin: 0;
+        }
+        
+        /* Hiệu ứng Feedback */
+        .feedback {
+            transition: all 0.3s ease-in-out;
+            max-height: 0;
+            opacity: 0;
+            overflow: hidden;
+        }
+        .feedback.show {
+            max-height: 250px;
+            opacity: 1;
+            margin-top: 1rem;
+        }
+
+        /* Thanh tiến trình */
+        .progress-bar-fill {
+            transition: width 0.5s ease-in-out;
+        }
+
+        /* --- Cấu trúc Tab Mới --- */
+        .tab-btn {
+            padding: 0.75rem 1.25rem;
+            font-size: 1.125rem; /* text-lg */
+            font-weight: 500;
+            border-bottom: 3px solid transparent;
+            color: #9CA3AF; /* text-gray-400 */
+            transition: all 0.3s ease;
+            transform: translateY(1px); /* Cho khớp với border bottom */
+        }
+        .tab-btn:hover {
+            color: #FFFFFF; /* text-white */
+        }
+        .tab-btn.active {
+            color: #FF9800; /* text-primary-orange */
+            border-bottom-color: #FF9800; /* border-primary-orange */
+        }
+        .tab-panel {
+            display: none;
+            padding-top: 1.5rem; /* 24px */
+        }
+        .tab-panel.active {
+            display: block;
+        }
+        
+        /* Tùy chỉnh cho nội dung Hướng dẫn */
+        .guide-content h3 {
+            font-size: 1.25rem; /* text-xl */
+            font-weight: 600;
+            color: #FF9800; /* text-primary-orange */
+            margin-top: 1.25rem;
+            margin-bottom: 0.5rem;
+        }
+        .guide-content p, .guide-content li {
+            font-size: 1rem; /* text-base */
+            color: #D1D5DB; /* text-gray-300 */
+            line-height: 1.6;
+        }
+        .guide-content ul {
+            list-style-type: disc;
+            padding-left: 1.5rem;
+            margin-top: 0.5rem;
+        }
+        .guide-content ol {
+             list-style-type: decimal;
+            padding-left: 1.5rem;
+            margin-top: 0.5rem;
+        }
+        .guide-content .guide-do {
+            border-left: 4px solid #009688; /* border-primary-green */
+            background-color: rgba(0, 150, 136, 0.05);
+            padding: 0.75rem 1rem;
+        }
+        .guide-content .guide-dont {
+            border-left: 4px solid #EF4444; /* border-red-500 */
+            background-color: rgba(239, 68, 68, 0.05);
+            padding: 0.75rem 1rem;
+        }
+
+    </style>
+</head>
+<body class="h-full text-gray-200 p-4 md:p-8">
+
+    <main class="max-w-4xl mx-auto bg-gray-900 shadow-2xl shadow-primary-blue/20 rounded-2xl overflow-hidden">
+        <!-- TIÊU ĐỀ CHÍNH -->
+        <header class="p-6 bg-primary-blue/10 border-b border-primary-blue/30">
+            <div class="flex items-center justify-between">
+                <div>
+                    <h1 class="text-3xl font-bold text-white tracking-wide">Bài tập: QUY TRÌNH ĐỊNH GIÁ THỊ TRƯỜNG 5 BƯỚC</h1>
+                    <p class="text-md text-primary-orange uppercase font-semibold">Case Study: Công ty Công nghệ TechGarden</p>
+                </div>
+                <i class="fa-solid fa-seedling text-4xl text-primary-green"></i>
+            </div>
+        </header>
+
+        <!-- THANH TIẾN TRÌNH -->
+        <div class="w-full bg-gray-700 h-2.5">
+            <div id="progress-bar" class="bg-primary-orange h-2.5 rounded-r-full progress-bar-fill" style="width: 0%;"></div>
+        </div>
+
+        <!-- NỘI DUNG CÁC BƯỚC -->
+        <div class="p-6 md:p-8 space-y-6">
+
+            <!-- GIỚI THIỆU (Không phải là một bước) -->
+            <div id="intro-content">
+                <h2 class="text-2xl font-semibold text-white mb-3">Điểm Khởi đầu: Nhiệm vụ của bạn</h2>
+                <p class="text-gray-300 leading-relaxed text-lg">
+                    Chào mừng bạn đến với TechGarden! Chúng tôi là một công ty SaaS 500 nhân viên đang trên đà phát triển bùng nổ.
+                </p>
+                <p class="text-gray-300 leading-relaxed text-lg mt-2">
+                    Chúng tôi tin tưởng giao cho bạn nhiệm vụ chiến lược đầu tiên: Xây dựng một cấu trúc lương thưởng cạnh tranh, bắt đầu bằng việc định giá vị trí huyết mạch: <strong>"Senior Software Engineer"</strong>.
+                </p>
+                <p class="text-gray-300 leading-relaxed text-lg mt-2">
+                    Hãy vận hành "Quy trình 5 Bước" để biến dữ liệu thành chiến lược. Chúc may mắn!
+                </p>
+            </div>
+            
+            <!-- BƯỚC 0: TRIẾT LÝ LƯƠNG THƯỞNG (Từ Slide 6-12) -->
+            <section id="step-0" class="step-content active">
+                <!-- Tab Navigation -->
+                <div class="flex border-b border-primary-blue/30 mb-4">
+                    <button class="tab-btn active" data-step="0" data-tab="guide">
+                        <i class="fa-solid fa-book-open mr-2"></i> Hướng dẫn
+                    </button>
+                    <button class="tab-btn" data-step="0" data-tab="exercise">
+                        <i class="fa-solid fa-pen-ruler mr-2"></i> Bài tập
+                    </button>
+                </div>
+
+                <!-- Tab Panel: Hướng dẫn -->
+                <div id="tab-panel-guide-0" class="tab-panel active guide-content">
+                    <h2 class="text-2xl font-semibold text-white mb-4">Nền tảng: Định hình Triết lý (Slide 6-12)</h2>
+                    
+                    <h3><i class="fa-solid fa-question-circle text-primary-blue mr-2"></i> Triết lý Lương thưởng là gì?</h3>
+                    <p>Đây là "la bàn" chiến lược của công ty, một tuyên bố chính thức về việc công ty muốn trả lương như thế nào so với thị trường. Nó là câu trả lời cho câu hỏi: "Chúng ta muốn trở thành nhà tuyển dụng như thế nào?"</p>
+
+                    <h3><i class="fa-solid fa-lightbulb text-primary-blue mr-2"></i> Vì sao nó tối quan trọng?</h3>
+                    <ul>
+                        <li><strong>Để nhất quán:</strong> Ngăn chặn các quyết định cảm tính, "người này thích thì trả cao, người kia không thích thì trả thấp".</li>
+                        <li><strong>Để cạnh tranh:</strong> Đảm bảo chúng ta thu hút và giữ chân được ĐÚNG loại nhân tài mà chiến lược kinh doanh cần.</li>
+                        <li><strong>Để phòng thủ pháp lý:</strong> Là bằng chứng cho thấy các quyết định về lương là khách quan, dựa trên chiến lược, không phải phân biệt đối xử.</li>
+                    </ul>
+
+                    <h3><i class="fa-solid fa-gears text-primary-blue mr-2"></i> Làm thế nào để xác định?</h3>
+                    <p>Một triết lý tốt phải trả lời 3 câu hỏi:</p>
+                    <ol class="list-decimal list-inside mt-2 space-y-1">
+                        <li><strong>Vị thế Mục tiêu:</strong> Chúng ta muốn trả lương ở mức nào? (P25 - Tiết kiệm, P50 - Theo thị trường, P75 - Dẫn đầu).</li>
+                        <li><strong>Cơ cấu Lương thưởng (Pay Mix):</strong> Tỷ lệ giữa lương cứng (ổn định) và lương biến đổi (thưởng, cổ phiếu)?</li>
+                        <li><strong>Nhóm Đối thủ:</strong> Chúng ta đang cạnh tranh với ai? (Ngành, Quy mô, Địa lý).</li>
+                    </ol>
+                    
+                    <h3><i class="fa-solid fa-check-double text-primary-green mr-2"></i> Thế nào là Đúng?</h3>
+                    <div class="guide-do">
+                        <p><strong>Ví dụ Đúng:</strong> Một công ty công nghệ cao (như TechGarden) cần thu hút kỹ sư giỏi nhất, chiến lược của họ PHẢI là "Dẫn đầu" (P75) và "Ưu tiên Lương biến đổi" (cổ phiếu, thưởng) để giữ chân nhân tài. Mọi thứ phải liên kết với chiến lược kinh doanh.</p>
+                    </div>
+
+                    <h3><i class="fa-solid fa-times-circle text-red-500 mr-2"></i> Thế nào là Sai?</h3>
+                    <div class="guide-dont">
+                        <p><strong>Ví dụ Sai:</strong> Công ty công nghệ nói "chúng tôi muốn nhân tài tốt nhất" nhưng lại chọn triết lý "Theo sau thị trường" (P25) để... tiết kiệm chi phí. Đây là mâu thuẫn chiến lược và sẽ thất bại.</p>
+                    </div>
+                </div>
+
+                <!-- Tab Panel: Bài tập -->
+                <div id="tab-panel-exercise-0" class="tab-panel">
+                    <p class="text-gray-300 mb-4 text-lg">Đây là "la bàn" của chúng ta. Mọi quyết định về lương phải bắt nguồn từ chiến lược. Hãy chọn triết lý cho TechGarden (một công ty công nghệ tăng trưởng nhanh, cạnh tranh nhân tài gay gắt).</p>
+                    
+                    <div class="space-y-4">
+                        <!-- 1. Vị thế Mục tiêu -->
+                        <div>
+                            <label class="font-semibold text-white text-lg">1. Vị thế Mục tiêu (Target Position) của TechGarden?</label>
+                            <select id="philosophy-position" class="w-full mt-2 p-3 rounded bg-gray-800 text-white border border-primary-blue/50 focus:ring-2 focus:ring-primary-orange outline-none text-lg">
+                                <option value="">-- Chọn một --</option>
+                                <option value="lag">Theo sau thị trường (P25) - Tiết kiệm chi phí</option>
+                                <option value="meet">Theo thị trường (P50) - Cạnh tranh tiêu chuẩn</option>
+                                <option value="lead">Dẫn đầu thị trường (P75) - Thu hút nhân tài tốt nhất</option>
+                            </select>
+                            <div id="feedback-step-0-1" class="feedback p-3 rounded"></div>
+                        </div>
+                        
+                        <!-- 2. Cơ cấu Lương thưởng -->
+                        <div>
+                            <label class="font-semibold text-white text-lg">2. Cơ cấu Lương thưởng (Pay Mix) cho vị trí công nghệ?</label>
+                            <select id="philosophy-mix" class="w-full mt-2 p-3 rounded bg-gray-800 text-white border border-primary-blue/50 focus:ring-2 focus:ring-primary-orange outline-none text-lg">
+                                <option value="">-- Chọn một --</option>
+                                <option value="base">Ưu tiên Lương cơ bản (Ổn định, Rủi ro thấp)</option>
+                                <option value="variable">Ưu tiên Lương biến đổi (Thưởng/Cổ phiếu - Hiệu suất cao, Rủi ro cao)</option>
+                            </select>
+                            <div id="feedback-step-0-2" class="feedback p-3 rounded"></div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- BƯỚC 1: KẾT NỐI CÔNG VIỆC (Từ Slide 16-20) -->
+            <section id="step-1" class="step-content">
+                <!-- Tab Navigation -->
+                <div class="flex border-b border-primary-blue/30 mb-4">
+                    <button class="tab-btn active" data-step="1" data-tab="guide">
+                        <i class="fa-solid fa-book-open mr-2"></i> Hướng dẫn
+                    </button>
+                    <button class="tab-btn" data-step="1" data-tab="exercise">
+                        <i class="fa-solid fa-pen-ruler mr-2"></i> Bài tập
+                    </button>
+                </div>
+
+                <!-- Tab Panel: Hướng dẫn -->
+                <div id="tab-panel-guide-1" class="tab-panel active guide-content">
+                    <h2 class="text-2xl font-semibold text-white mb-4">Bước 1: Kết nối Công việc (Slide 16-20)</h2>
+                    
+                    <h3><i class="fa-solid fa-question-circle text-primary-blue mr-2"></i> Job Matching là gì?</h3>
+                    <p>Là quá trình "dịch" một vị trí công việc nội bộ của công ty bạn sang một vị trí tương đương trong cơ sở dữ liệu của khảo sát lương.</p>
+
+                    <h3><i class="fa-solid fa-lightbulb text-primary-blue mr-2"></i> Vì sao nó quan trọng?</h3>
+                    <p>Đây là nền tảng của toàn bộ quy trình. Nếu bạn so khớp sai (ví dụ: so "táo" của bạn với "cam" của thị trường), toàn bộ dữ liệu bạn thu về sẽ VÔ NGHĨA và dẫn đến quyết định sai lầm. "Rác vào, rác ra" (Garbage in, garbage out).</p>
+
+                    <h3><i class="fa-solid fa-gears text-primary-blue mr-2"></i> Làm thế nào để làm?</h3>
+                    <p>Tuân thủ "Nguyên tắc Vàng": <strong>Không bao giờ so khớp bằng Chức danh. Luôn so khớp bằng Trách nhiệm Cốt lõi.</strong></p>
+                    <p class="mt-2">Thông lệ tốt nhất là "Quy tắc 70%": Một kết nối được coi là hợp lệ khi mô tả công việc của khảo sát khớp ít nhất 70% với trách nhiệm của công việc nội bộ.</p>
+                    
+                    <h3><i class="fa-solid fa-check-double text-primary-green mr-2"></i> Thế nào là Đúng?</h3>
+                    <div class="guide-do">
+                        <p><strong>Ví dụ Đúng:</strong> Vị trí "Senior" của bạn có trách nhiệm "mentor/dẫn dắt nhóm". Vị trí trong khảo sát tên là "Lead" nhưng cũng có trách nhiệm "dẫn dắt kỹ thuật cho nhóm nhỏ". <br><strong><i class="fa-solid fa-arrow-right"></i> Đây là một kết nối ĐÚNG (khớp 70%+ trách nhiệm).</strong></p>
+                    </div>
+
+                    <h3><i class="fa-solid fa-times-circle text-red-500 mr-2"></i> Thế nào là Sai?</h3>
+                    <div class="guide-dont">
+                        <p><strong>Ví dụ Sai:</strong> Vị trí "Senior" của bạn khớp tên 100% với vị trí "Senior" trong khảo sát. Nhưng mô tả của khảo sát lại ghi "làm việc độc lập, không có trách nhiệm dẫn dắt". <br><strong><i class="fa-solid fa-arrow-right"></i> Đây là một kết nối SAI (trách nhiệm cốt lõi bị lệch).</strong></p>
+                    </div>
+                </div>
+
+                <!-- Tab Panel: Bài tập -->
+                <div id="tab-panel-exercise-1" class="tab-panel">
+                    <p class="text-gray-300 mb-4 text-lg">Hãy áp dụng "Nguyên tắc Vàng": So khớp <strong class="text-primary-orange">"Giá trị Công việc" (Trách nhiệm)</strong>, không phải "Chức danh" (Nhãn dán).</p>
+                    <p class="text-gray-300 mb-4 text-lg">Vị trí nội bộ của chúng ta là <strong>"Senior Software Engineer"</strong> với mô tả: <em class="text-gray-400">"Thiết kế kiến trúc hệ thống, 5+ năm KN, và <strong>dẫn dắt/cố vấn (mentor) cho 2-3 kỹ sư junior</strong>."</em></p>
+                    <p class="text-gray-300 mb-4 text-lg">Bạn tìm thấy 2 vị trí trong khảo sát lương. Bạn sẽ chọn vị trí nào?</p>
+
+                    <div class="space-y-4">
+                        <!-- Lựa chọn 1 -->
+                        <label class="block p-4 rounded-lg bg-gray-700/60 border-2 border-gray-700 hover:border-primary-orange cursor-pointer">
+                            <input type="radio" name="job-match" value="wrong" class="mr-3 transform scale-125">
+                            <strong class="text-lg">Lựa chọn A:</strong> Chức danh <u class="text-primary-blue">"Senior Software Engineer"</u>
+                            <p class="text-md text-gray-400 mt-1 pl-6">Mô tả khảo sát: "Lập trình các tính năng phức tạp, 5+ năm KN, <strong class="text-red-400">làm việc độc lập, không có trách nhiệm dẫn dắt</strong>."</p>
+                        </label>
+                        <!-- Lựa chọn 2 -->
+                        <label class="block p-4 rounded-lg bg-gray-700/60 border-2 border-gray-700 hover:border-primary-orange cursor-pointer">
+                            <input type="radio" name="job-match" value="correct" class="mr-3 transform scale-125">
+                            <strong class="text-lg">Lựa chọn B:</strong> Chức danh <u class="text-primary-blue">"Lead Software Engineer"</u>
+                            <p class="text-md text-gray-400 mt-1 pl-6">Mô tả khảo sát: "Thiết kế hệ thống, 5+ năm KN, <strong class="text-primary-green">chịu trách nhiệm dẫn dắt kỹ thuật cho một nhóm nhỏ (2-5 người)</strong>."</p>
+                        </label>
+                    </div>
+                    <div id="feedback-step-1" class="feedback p-3 rounded border text-md"></div>
+                </div>
+            </section>
+
+            <!-- BƯỚC 2: PHÂN KHÚC DỮ LIỆU (Từ Slide 21-24) -->
+            <section id="step-2" class="step-content">
+                <!-- Tab Navigation -->
+                <div class="flex border-b border-primary-blue/30 mb-4">
+                    <button class="tab-btn active" data-step="2" data-tab="guide">
+                        <i class="fa-solid fa-book-open mr-2"></i> Hướng dẫn
+                    </button>
+                    <button class="tab-btn" data-step="2" data-tab="exercise">
+                        <i class="fa-solid fa-pen-ruler mr-2"></i> Bài tập
+                    </button>
+                </div>
+
+                <!-- Tab Panel: Hướng dẫn -->
+                <div id="tab-panel-guide-2" class="tab-panel active guide-content">
+                    <h2 class="text-2xl font-semibold text-white mb-4">Bước 2: Phân khúc Dữ liệu (Scoping) (Slide 21-24)</h2>
+                    
+                    <h3><i class="fa-solid fa-question-circle text-primary-blue mr-2"></i> Scoping là gì?</h3>
+                    <p>Là quá trình "lọc" cơ sở dữ liệu khảo sát khổng lồ để tạo ra một "nhóm so sánh" (peer group) phù hợp nhất với công ty của bạn. Bạn không thể so mình với "tất cả mọi người".</p>
+
+                    <h3><i class="fa-solid fa-lightbulb text-primary-blue mr-2"></i> Vì sao phải làm vậy?</h3>
+                    <p>Thị trường lao động không đồng nhất. Lương cho một Kế toán ở công ty Dầu khí (lợi nhuận cao) sẽ khác một Kế toán ở tổ chức phi chính phủ (lợi nhuận thấp). Lương ở TP.HCM khác lương ở Hà Tĩnh. Lương ở công ty lớn khác lương ở công ty nhỏ. Lọc sai sẽ cho ra kết quả sai lệch.</p>
+
+                    <h3><i class="fa-solid fa-gears text-primary-blue mr-2"></i> Làm thế nào để làm?</h3>
+                    <p>Sử dụng 3 bộ lọc chính (thường xuất phát từ Triết lý ở Bước 0):</p>
+                    <ol class="list-decimal list-inside mt-2 space-y-1">
+                        <li><strong>Ngành (Industry):</strong> Vị trí này có đặc thù ngành không? (VD: Kỹ sư công nghệ) hay là vị trí chung? (VD: Kế toán).</li>
+                        <li><strong>Quy mô (Revenue/Headcount):</strong> Công ty lớn hơn thường trả lương cao hơn. Hãy lọc các công ty có quy mô tương tự bạn.</li>
+                        <li><strong>Địa lý (Geography):</strong> Thị trường tuyển dụng của bạn là ở đâu? (Địa phương, Toàn quốc, Toàn cầu?).</li>
+                    </ol>
+                    
+                    <h3><i class="fa-solid fa-check-double text-primary-green mr-2"></i> Thế nào là Đúng?</h3>
+                    <div class="guide-do">
+                        <p><strong>Ví dụ Đúng:</strong> TechGarden (công nghệ, 500 người, tuyển toàn quốc) khi lọc vị trí Kỹ sư phải chọn: Ngành = "Công nghệ cao", Quy mô = "Tương tự", Địa lý = "Toàn quốc".</p>
+                    </div>
+
+                    <h3><i class="fa-solid fa-times-circle text-red-500 mr-2"></i> Thế nào là Sai?</h3>
+                    <div class="guide-dont">
+                        <p><strong>Ví dụ Sai:</strong> Chỉ lọc theo "Ngành công nghiệp chung" (quá rộng) và "Địa phương" (quá hẹp, trong khi thực tế tuyển dụng toàn quốc). Kết quả sẽ bị thấp giả tạo so với đối thủ thực sự.</p>
+                    </div>
+                </div>
+                
+                <!-- Tab Panel: Bài tập -->
+                <div id="tab-panel-exercise-2" class="tab-panel">
+                    <p class="text-gray-300 mb-4 text-lg">Tuyệt vời. Bạn đã có một "neo" công việc chính xác. Giờ, hãy xác định chúng ta đang "chiến đấu" với ai. Hãy dùng Triết lý (ở Bước 0) để lọc (scope cuts) thị trường cho vị trí <strong>"Lead Software Engineer"</strong>.</p>
+                    
+                    <div class="space-y-4">
+                        <!-- 1. Ngành nghề -->
+                        <div>
+                            <label class="font-semibold text-white text-lg">1. Ngành nghề (Industry)</label>
+                            <select id="scope-industry" class="w-full mt-2 p-3 rounded bg-gray-800 text-white border border-primary-blue/50 focus:ring-2 focus:ring-primary-orange outline-none text-lg">
+                                <option value="">-- Chọn một --</option>
+                                <option value="general">Ngành công nghiệp chung (Data rộng, ít liên quan)</option>
+                                <option value="tech">Công nghệ cao (Đối thủ trực tiếp, data liên quan nhất)</option>
+                            </select>
+                        </div>
+                        <!-- 2. Quy mô -->
+                        <div>
+                            <label class="font-semibold text-white text-lg">2. Quy mô Doanh thu (Revenue)</label>
+                            <select id="scope-revenue" class="w-full mt-2 p-3 rounded bg-gray-800 text-white border border-primary-blue/50 focus:ring-2 focus:ring-primary-orange outline-none text-lg">
+                                <option value="">-- Chọn một --</option>
+                                <option value="all">Tất cả quy mô (Bao gồm cả tập đoàn lớn)</option>
+                                <option value="match">Tương tự TechGarden (500 nhân viên)</option>
+                            </select>
+                        </div>
+                        <!-- 3. Địa lý -->
+                        <div>
+                            <label class="font-semibold text-white text-lg">3. Địa lý (Geography)</label>
+                            <select id="scope-geo" class="w-full mt-2 p-3 rounded bg-gray-800 text-white border border-primary-blue/50 focus:ring-2 focus:ring-primary-orange outline-none text-lg">
+                                <option value="">-- Chọn một --</option>
+                                <option value="local">Chỉ ở địa phương (Thị trường hẹp)</option>
+                                <option value="national">Toàn quốc (Vì chúng ta tuyển dụng từ xa)</option>
+                            </select>
+                        </div>
+                    </div>
+                    <div id="feedback-step-2" class="feedback p-3 rounded border text-md"></div>
+                </div>
+            </section>
+
+            <!-- BƯỚC 3: LÀM MỚI DỮ LIỆU (Từ Slide 25-28) -->
+            <section id="step-3" class="step-content">
+                <!-- Tab Navigation -->
+                <div class="flex border-b border-primary-blue/30 mb-4">
+                    <button class="tab-btn active" data-step="3" data-tab="guide">
+                        <i class="fa-solid fa-book-open mr-2"></i> Hướng dẫn
+                    </button>
+                    <button class="tab-btn" data-step="3" data-tab="exercise">
+                        <i class="fa-solid fa-pen-ruler mr-2"></i> Bài tập
+                    </button>
+                </div>
+
+                <!-- Tab Panel: Hướng dẫn -->
+                <div id="tab-panel-guide-3" class="tab-panel active guide-content">
+                    <h2 class="text-2xl font-semibold text-white mb-4">Bước 3: Làm mới Dữ liệu (Data Aging) (Slide 25-28)</h2>
+                    
+                    <h3><i class="fa-solid fa-question-circle text-primary-blue mr-2"></i> Data Aging là gì?</h3>
+                    <p>Là quá trình điều chỉnh dữ liệu lương từ quá khứ lên một thời điểm trong tương lai (thường là ngày hôm nay, hoặc ngày đầu năm mới) bằng cách áp dụng một tỷ lệ tăng lương dự báo.</p>
+
+                    <h3><i class="fa-solid fa-lightbulb text-primary-blue mr-2"></i> Vì sao phải làm vậy?</h3>
+                    <p>Dữ liệu khảo sát luôn là một "bức ảnh" chụp tại một thời điểm (ví dụ: 6 tháng trước). Nếu bạn sử dụng con số $120,000 của 6 tháng trước, bạn đang tự động trả lương "lỗi thời" so với thị trường, vốn luôn vận động.</p>
+
+                    <h3><i class="fa-solid fa-gears text-primary-blue mr-2"></i> Làm thế nào để làm?</h3>
+                    <p>Đây là công thức 2 bước:</p>
+                    <ol class="list-decimal list-inside mt-2 space-y-1">
+                        <li><strong>Tính Tỷ lệ Làm mới theo Kỳ:</strong> (Tỷ lệ Tăng lương Dự báo / 12 tháng) &times; Số tháng cần làm mới.<br>
+                            <em>Ví dụ: (Dự báo 4% / 12 tháng) &times; 6 tháng = 2.0%</em></li>
+                        <li><strong>Tính Lương đã Làm mới:</strong> Lương Khảo sát &times; (1 + Tỷ lệ Làm mới theo Kỳ).<br>
+                            <em>Ví dụ: $120,000 &times; (1 + 0.020) = $122,400</em></li>
+                    </ol>
+                    
+                    <h3><i class="fa-solid fa-check-double text-primary-green mr-2"></i> Thế nào là Đúng?</h3>
+                    <div class="guide-do">
+                        <p><strong>Đúng:</strong> Áp dụng đúng tỷ lệ % cho đúng số tháng. Nếu dữ liệu cách đây 6 tháng, bạn chỉ được áp dụng (Tỷ lệ/năm / 2).</p>
+                    </div>
+
+                    <h3><i class="fa-solid fa-times-circle text-red-500 mr-2"></i> Thế nào là Sai?</h3>
+                    <div class="guide-dont">
+                        <p><strong>Sai:</strong> Thấy dự báo tăng 4% và cộng 4% vào lương khảo sát. 4% là cho cả NĂM, không phải cho 6 tháng. Điều này sẽ làm con số bị "thổi phồng" quá mức.</p>
+                    </div>
+                </div>
+
+                <!-- Tab Panel: Bài tập -->
+                <div id="tab-panel-exercise-3" class="tab-panel">
+                    <p class="text-gray-300 mb-4 text-lg">Dữ liệu thị trường luôn "lỗi thời" ngay khi xuất bản. Nhiệm vụ của bạn là đưa nó về "thì hiện tại".</p>
+                    <p class="text-gray-300 mb-4 text-lg">Dữ liệu (đã lọc) cho thấy Trung vị (P50) là <strong>$120,000</strong>. Dữ liệu này được thu thập <strong>6 tháng trước</strong> (Ngày hiệu lực khảo sát: 1/7/2025). Chúng ta cần làm mới nó đến hôm nay (1/1/2026).</p>
+                    <p class="text-gray-300 mb-4 text-lg">Dự báo tăng lương ngành công nghệ năm nay là <strong>4.0%</strong>.</p>
+                    
+                    <div class="space-y-4 p-4 bg-gray-700/60 rounded-lg border border-primary-blue/30">
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                            <div>
+                                <label for="aging-rate" class="block text-md font-medium text-gray-300">Tỷ lệ Tăng lương Dự báo/Năm</label>
+                                <input type="text" value="4.0%" class="w-full mt-1 p-3 rounded bg-gray-600 text-gray-400 border border-gray-500 text-lg" disabled>
+                            </div>
+                            <div>
+                                <label for="aging-months" class="block text-md font-medium text-gray-300">Số tháng cần Làm mới</label>
+                                <input type="text" value="6 tháng" class="w-full mt-1 p-3 rounded bg-gray-600 text-gray-400 border border-gray-500 text-lg" disabled>
+                            </div>
+                        </div>
+                        
+                        <hr class="border-gray-600">
+
+                        <div>
+                            <label for="aging-period-rate" class="block text-md font-medium text-white">1. Tính Tỷ lệ Làm mới theo Kỳ (%):</label>
+                            <p class="text-sm text-gray-400 mb-1">(Tỷ lệ/năm &divide; 12) &times; Số tháng. (Ví dụ: 4.0 / 12 * 6 = 2.0)</p>
+                            <input type="number" id="aging-period-rate" placeholder="Nhập kết quả %" class="w-full p-3 rounded bg-gray-800 text-white border border-primary-blue/50 focus:ring-2 focus:ring-primary-orange outline-none text-lg">
+                        </div>
+                        
+                        <div>
+                            <label for="aged-salary" class="block text-md font-medium text-white">2. Tính Lương Trung vị đã Làm mới ($):</label>
+                            <p class="text-sm text-gray-400 mb-1">Lương gốc &times; (1 + Tỷ lệ Làm mới). (Ví dụ: 120,000 * 1.02 = 122,400)</p>
+                            <input type="number" id="aged-salary" placeholder="Nhập kết quả $" class="w-full p-3 rounded bg-gray-800 text-white border border-primary-blue/50 focus:ring-2 focus:ring-primary-orange outline-none text-lg">
+                        </div>
+                    </div>
+                    <div id="feedback-step-3" class="feedback p-3 rounded border text-md"></div>
+                </div>
+            </section>
+
+            <!-- BƯỚC 4: TỔNG HỢP & GIA QUYỀN (Từ Slide 29-32) -->
+            <section id="step-4" class="step-content">
+                <!-- Tab Navigation -->
+                <div class="flex border-b border-primary-blue/30 mb-4">
+                    <button class="tab-btn active" data-step="4" data-tab="guide">
+                        <i class="fa-solid fa-book-open mr-2"></i> Hướng dẫn
+                    </button>
+                    <button class="tab-btn" data-step="4" data-tab="exercise">
+                        <i class="fa-solid fa-pen-ruler mr-2"></i> Bài tập
+                    </button>
+                </div>
+
+                <!-- Tab Panel: Hướng dẫn -->
+                <div id="tab-panel-guide-4" class="tab-panel active guide-content">
+                    <h2 class="text-2xl font-semibold text-white mb-4">Bước 4: Tổng hợp & Gia quyền (Blending) (Slide 29-32)</h2>
+                    
+                    <h3><i class="fa-solid fa-question-circle text-primary-blue mr-2"></i> Blending & Weighting là gì?</h3>
+                    <p>Là quá trình "trộn" nhiều nguồn dữ liệu (từ nhiều khảo sát) lại với nhau để tạo ra một con số thị trường thống nhất, đáng tin cậy. "Gia quyền" (Weighting) là việc bạn quyết định "tin" vào nguồn nào hơn.</p>
+
+                    <h3><i class="fa-solid fa-lightbulb text-primary-blue mr-2"></i> Vì sao phải làm vậy?</h3>
+                    <p>Thông lệ tốt nhất là không bao giờ dựa vào MỘT nguồn dữ liệu duy nhất. Điều đó rất rủi ro, vì lỡ như nguồn đó có sai sót hoặc không đại diện đúng thị trường? Trộn ít nhất 3 nguồn sẽ giúp làm "mịn" các điểm bất thường và cho ra một con số "phòng thủ được".</p>
+
+                    <h3><i class="fa-solid fa-gears text-primary-blue mr-2"></i> Làm thế nào để làm?</h3>
+                    <p>Sử dụng phương pháp "Trung bình cộng Gia quyền". Bạn gán một trọng số (tỷ lệ %) cho mỗi nguồn, miễn sao tổng là 100%.</p>
+                    <ol class="list-decimal list-inside mt-2 space-y-1">
+                        <li><strong>Nguồn 1 ($122.4k)</strong> &times; <strong>Trọng số 1 (%)</strong> = Giá trị 1</li>
+                        <li><strong>Nguồn 2 ($118.0k)</strong> &times; <strong>Trọng số 2 (%)</strong> = Giá trị 2</li>
+                        <li><strong>Nguồn 3 ($120.0k)</strong> &times; <strong>Trọng số 3 (%)</strong> = Giá trị 3</li>
+                    </ol>
+                    <p class="mt-2"><strong>Trung vị Tổng hợp = Giá trị 1 + Giá trị 2 + Giá trị 3</strong></p>
+                    
+                    <h3><i class="fa-solid fa-check-double text-primary-green mr-2"></i> Thế nào là Đúng?</h3>
+                    <div class="guide-do">
+                        <p><strong>Đúng:</strong> Gán trọng số cao nhất (ví dụ: 50%) cho nguồn dữ liệu mà bạn tin là liên quan nhất (VD: Khảo sát "Công nghệ cao") và gán trọng số thấp hơn (VD: 30%, 20%) cho các nguồn ít liên quan hơn.</p>
+                    </div>
+
+                    <h3><i class="fa-solid fa-times-circle text-red-500 mr-2"></i> Thế nào là Sai?</h3>
+                    <div class="guide-dont">
+                        <p><strong>Sai:</strong> Chia đều 33.3% cho cả 3 nguồn. Điều này là một sự lười biếng chiến lược, vì nó giả định cả 3 nguồn đều quan trọng như nhau, trong khi rõ ràng là không phải vậy.</p>
+                    </div>
+                </div>
+                
+                <!-- Tab Panel: Bài tập -->
+                <div id="tab-panel-exercise-4" class="tab-panel">
+                    <p class="text-gray-300 mb-4 text-lg">Rủi ro lớn nhất là chỉ tin vào một nguồn. Một chuyên gia chiến lược sẽ tổng hợp nhiều nguồn để có một con số "phòng thủ được" (defensible number).</p>
+                    <p class="text-gray-300 mb-4 text-lg">Chúng ta có 3 nguồn (đã làm mới). Hãy gán trọng số (tổng 100%) để tạo ra một điểm thị trường thống nhất.</p>
+                    <p class="text-primary-blue/80 text-md mb-4 font-mono tracking-wider"><i class="fa-solid fa-lightbulb mr-2"></i> Gợi ý chiến lược: Dữ liệu "Công nghệ cao" (A) là quan trọng nhất. Hãy thử gán cho nó <strong>50%</strong> trọng số và chia <strong>50%</strong> còn lại cho hai nguồn kia (Vd: 30% và 20%).</p>
+                    
+                    <div class="space-y-3 p-4 bg-gray-700/60 rounded-lg border border-primary-blue/30">
+                        <!-- Hàng 1 -->
+                        <div class="grid grid-cols-3 gap-3 items-center">
+                            <span class="text-gray-300 text-lg">Khảo sát A (Ngành Công nghệ):</span>
+                            <span class="text-xl font-semibold text-primary-green">$122,400</span>
+                            <input type="number" id="blend-weight-a" placeholder="Trọng số % (Vd: 50)" class="w-full p-3 rounded bg-gray-800 text-white border border-primary-blue/50 focus:ring-2 focus:ring-primary-orange outline-none text-lg blend-weight">
+                        </div>
+                        <!-- Hàng 2 -->
+                        <div class="grid grid-cols-3 gap-3 items-center">
+                            <span class="text-gray-300 text-lg">Khảo sát B (Ngành Chung):</span>
+                            <span class="text-xl font-semibold text-primary-green">$118,000</span>
+                            <input type="number" id="blend-weight-b" placeholder="Trọng số % (Vd: 30)" class="w-full p-3 rounded bg-gray-800 text-white border border-primary-blue/50 focus:ring-2 focus:ring-primary-orange outline-none text-lg blend-weight">
+                        </div>
+                        <!-- Hàng 3 -->
+                        <div class="grid grid-cols-3 gap-3 items-center">
+                            <span class="text-gray-300 text-lg">Khảo sát C (Khu vực):</span>
+                            <span class="text-xl font-semibold text-primary-green">$120,000</span>
+                            <input type="number" id="blend-weight-c" placeholder="Trọng số % (Vd: 20)" class="w-full p-3 rounded bg-gray-800 text-white border border-primary-blue/50 focus:ring-2 focus:ring-primary-orange outline-none text-lg blend-weight">
+                        </div>
+                        
+                        <hr class="border-gray-600">
+                        
+                        <!-- Kết quả -->
+                        <div class="grid grid-cols-3 gap-3 items-center">
+                            <span class="font-semibold text-white text-lg">Tổng Trọng số:</span>
+                            <span id="blend-total-weight" class="text-xl font-bold text-white">0%</span>
+                            <div></div>
+                        </div>
+                        <div class="grid grid-cols-3 gap-3 items-center">
+                            <span class="font-semibold text-white text-lg">Trung vị Thị trường Tổng hợp:</span>
+                            <span id="blend-final-midpoint" class="text-2xl font-bold text-primary-orange">$0</span>
+                            <div></div>
+                        </div>
+                    </div>
+                    <div id="feedback-step-4" class="feedback p-3 rounded border text-md"></div>
+                </div>
+            </section>
+            
+            <!-- BƯỚC 5: PHÂN TÍCH (Từ Slide 33-35) -->
+            <section id="step-5" class="step-content">
+                <!-- Tab Navigation -->
+                <div class="flex border-b border-primary-blue/30 mb-4">
+                    <button class="tab-btn active" data-step="5" data-tab="guide">
+                        <i class="fa-solid fa-book-open mr-2"></i> Hướng dẫn
+                    </button>
+                    <button class="tab-btn" data-step="5" data-tab="exercise">
+                        <i class="fa-solid fa-pen-ruler mr-2"></i> Bài tập
+                    </button>
+                </div>
+
+                <!-- Tab Panel: Hướng dẫn -->
+                <div id="tab-panel-guide-5" class="tab-panel active guide-content">
+                    <h2 class="text-2xl font-semibold text-white mb-4">Bước 5 (Phần 1): Phân tích Compa-Ratio (Slide 33-35)</h2>
+                    
+                    <h3><i class="fa-solid fa-question-circle text-primary-blue mr-2"></i> Compa-Ratio là gì?</h3>
+                    <p>Là một chỉ số "sức khỏe" lương. Nó so sánh LƯƠNG THỰC TẾ của một nhân viên với ĐIỂM CHUẨN (thường là Trung vị P50) của thị trường cho vị trí đó.</p>
+
+                    <h3><i class="fa-solid fa-lightbulb text-primary-blue mr-2"></i> Vì sao phải dùng nó?</h3>
+                    <p>Đây là công cụ GIAO TIẾP quan trọng nhất với các cấp quản lý. Thay vì nói "Lương An thấp quá", bạn sẽ nói "Compa-Ratio của An là 95%". Nó biến các con số phức tạp thành một chỉ số duy nhất, giúp bạn biết: Ai đang được trả quá thấp (rủi ro nghỉ việc)? Ai đang được trả quá cao (tốn chi phí)?</p>
+
+                    <h3><i class="fa-solid fa-gears text-primary-blue mr-2"></i> Làm thế nào để tính?</h3>
+                    <p class="font-mono text-lg text-primary-orange bg-gray-800 p-3 rounded">Compa-Ratio = ( Lương thực tế &divide; Trung vị Thị trường ) &times; 100</p>
+                    <p class="mt-2">Ví dụ: (Lương An $115,000 / Trung vị $120,680) &times; 100 = 95.3%</p>
+                    
+                    <h3><i class="fa-solid fa-check-double text-primary-green mr-2"></i> Diễn giải Đúng?</h3>
+                    <div class="guide-do">
+                        <p>Một khoảng "lành mạnh" thường là 90% - 110%.<br>
+                        <strong>95.3% (như của An):</strong> Tốt! Cạnh tranh, nhưng vẫn còn "dư địa" để tăng lương dựa trên hiệu suất.</p>
+                    </div>
+
+                    <h3><i class="fa-solid fa-times-circle text-red-500 mr-2"></i> Diễn giải Sai?</h3>
+                    <div class="guide-dont">
+                        <p><strong>Sai:</strong> Thấy 95.3% (thấp hơn 100%) và vội vàng kết luận "phải tăng lương cho An ngay lập tức". Không hẳn! Compa-Ratio dưới 100% là bình thường với người mới, hoặc hiệu suất trung bình. Nó là một chỉ số để BẮT ĐẦU thảo luận, không phải là một mệnh lệnh.</p>
+                    </div>
+                </div>
+
+                <!-- Tab Panel: Bài tập -->
+                <div id="tab-panel-exercise-5" class="tab-panel">
+                    <p class="text-gray-300 mb-4 text-lg">Đây là lúc dữ liệu "biết nói". Chúng ta đã có Trung vị Thị trường Tổng hợp (P50) là <strong id="compa-midpoint-display" class="text-primary-orange">$120,680</strong>.</p>
+                    <p class="text-gray-300 mb-4 text-lg">Giờ, hãy xem nhân viên <strong>An Nguyễn</strong> (Senior Engineer) đang ở đâu. Lương hiện tại của An là <strong>$115,000</strong>. Hãy tính Compa-Ratio của An.</p>
+                    <p class="text-primary-blue/80 text-md mb-4 font-mono tracking-wider">Công thức: Compa-Ratio = ( Lương thực tế &divide; Trung vị Thị trường ) &times; 100</p>
+                    
+                    <div class="space-y-4 p-4 bg-gray-700/60 rounded-lg border border-primary-blue/30">
+                        <div>
+                            <label for="compa-ratio-calc" class="block text-md font-medium text-white">Tính Compa-Ratio của An (%):</label>
+                            <p class="text-sm text-gray-400 mb-1">(115,000 &divide; 120,680) &times; 100. (Làm tròn 1 chữ số thập phân, Vd: 95.3)</p>
+                            <input type="number" id="compa-ratio-calc" placeholder="Nhập kết quả %" class="w-full p-3 rounded bg-gray-800 text-white border border-primary-blue/50 focus:ring-2 focus:ring-primary-orange outline-none text-lg">
+                        </div>
+                    </div>
+                    <div id="feedback-step-5" class="feedback p-3 rounded border text-md"></div>
+                </div>
+            </section>
+
+            <!-- BƯỚC 6 (5.2): XÂY DỰNG CẤU TRÚC (Từ Slide 36-37) -->
+            <section id="step-6" class="step-content">
+                <!-- Tab Navigation -->
+                <div class="flex border-b border-primary-blue/30 mb-4">
+                    <button class="tab-btn active" data-step="6" data-tab="guide">
+                        <i class="fa-solid fa-book-open mr-2"></i> Hướng dẫn
+                    </button>
+                    <button class="tab-btn" data-step="6" data-tab="exercise">
+                        <i class="fa-solid fa-pen-ruler mr-2"></i> Bài tập
+                    </button>
+                </div>
+
+                <!-- Tab Panel: Hướng dẫn -->
+                <div id="tab-panel-guide-6" class="tab-panel active guide-content">
+                    <h2 class="text-2xl font-semibold text-white mb-4">Bước 5 (Phần 2): Kiến tạo Cấu trúc Lương (Slide 36-37)</h2>
+                    
+                    <h3><i class="fa-solid fa-question-circle text-primary-blue mr-2"></i> Cấu trúc Lương là gì?</h3>
+                    <p>Là "thành quả" cuối cùng. Đó là một "dải lương" (Range) bao gồm 3 điểm: Tối thiểu (Min), Trung vị (Midpoint), và Tối đa (Max) cho một "Ngạch lương" (Grade) cụ thể, nơi tập hợp các công việc có giá trị tương đương.</p>
+
+                    <h3><i class="fa-solid fa-lightbulb text-primary-blue mr-2"></i> Vì sao phải xây dựng nó?</h3>
+                    <p>Để quản lý lương một cách có hệ thống! Thay vì có 100 vị trí với 100 mức lương thị trường khác nhau, bạn gom chúng vào 10-15 ngạch lương. Điều này cho phép:</p>
+                    <ul>
+                        <li><strong>Linh hoạt:</strong> Trả lương cho người mới (ở Min) và chuyên gia (ở Max) trong cùng một công việc.</li>
+                        <li><strong>Công bằng:</strong> Đảm bảo các công việc có giá trị tương đương được trả trong cùng một dải.</li>
+                        <li><strong>Dễ quản lý:</strong> Dễ dàng truyền thông và điều chỉnh (chỉ cần điều chỉnh 15 ngạch, thay vì 100 vị trí).</li>
+                    </ul>
+
+                    <h3><i class="fa-solid fa-gears text-primary-blue mr-2"></i> Làm thế nào để làm?</h3>
+                    <p>Rất đơn giản, bạn chỉ cần 2 thứ: Dữ liệu P50 (từ Bước 4) và một quyết định về "Độ rộng Dải lương" (Range Spread).</p>
+                    <ol class="list-decimal list-inside mt-2 space-y-1">
+                        <li><strong>Điểm neo (Midpoint):</strong> Chính là Trung vị Thị trường Tổng hợp (ví dụ: $120,680).</li>
+                        <li><strong>Độ rộng Dải lương (Range Spread):</strong> Là một quyết định chiến lược (ví dụ: 50%).</li>
+                        <li><strong>Công thức Min:</strong> Midpoint &divide; (1 + (0.5 &times; Range Spread)).<br><em>VD: $120,680 / (1 + (0.5 * 0.5)) = $120,680 / 1.25 = $96,544</em></li>
+                        <li><strong>Công thức Max:</strong> Min &times; (1 + Range Spread).<br><em>VD: $96,544 * (1 + 0.5) = $144,816</em></li>
+                    </ol>
+                    
+                    <h3><i class="fa-solid fa-check-double text-primary-green mr-2"></i> Thế nào là Đúng?</h3>
+                    <div class="guide-do">
+                        <p><strong>Đúng:</strong> Tuân thủ công thức. Sử dụng Midpoint từ thị trường làm "mỏ neo" và áp dụng nhất quán Range Spread (ví dụ 50%) để tính toán Min và Max.</p>
+                    </div>
+
+                    <h3><i class="fa-solid fa-times-circle text-red-500 mr-2"></i> Thế nào là Sai?</h3>
+                    <div class="guide-dont">
+                        <p><strong>Sai:</strong> Đặt Midpoint, Min, Max một cách cảm tính ("tôi nghĩ Min nên là $90k chẵn"). Điều này phá vỡ toàn bộ tính logic và "phòng thủ được" của quy trình.</p>
+                    </div>
+                </div>
+
+                <!-- Tab Panel: Bài tập -->
+                <div id="tab-panel-exercise-6" class="tab-panel">
+                    <p class="text-gray-300 mb-4 text-lg">Từ dữ liệu, chúng ta kiến tạo ra "quy tắc". Đây là thành quả cuối cùng: Ngạch lương (Grade 10) cho vị trí "Senior Software Engineer".</p>
+                    <ul class="list-disc list-inside text-gray-300 mb-4 text-lg space-y-1">
+                        <li><strong>Trung vị (Midpoint):</strong> <span id="structure-midpoint-display" class="text-primary-orange font-bold">$120,680</span> (từ Bước 4)</li>
+                        <li><strong>Độ rộng Dải lương (Range Spread):</strong> <span class="text-primary-orange font-bold">50%</span> (Tiêu chuẩn cho vị trí chuyên nghiệp)</li>
+                    </ul>
+                    <p class="text-primary-blue/80 text-md mb-2 font-mono tracking-wider">Công thức Tối thiểu (Min): Midpoint &divide; (1 + (0.5 &times; Range Spread))</p>
+                    <p class="text-primary-blue/80 text-md mb-4 font-mono tracking-wider">Công thức Tối đa (Max): Min &times; (1 + Range Spread)</p>
+
+                    <div class="space-y-4 p-4 bg-gray-700/60 rounded-lg border border-primary-blue/30">
+                        <div>
+                            <label for="structure-min" class="block text-md font-medium text-white">1. Tính Mức Tối thiểu (Min) ($):</label>
+                            <p class="text-sm text-gray-400 mb-1">120,680 &divide; (1 + (0.5 &times; 0.50)) = 120,680 &divide; 1.25. (Làm tròn 0 chữ số thập phân, Vd: 96544)</p>
+                            <input type="number" id="structure-min" placeholder="Nhập kết quả Min $" class="w-full p-3 rounded bg-gray-800 text-white border border-primary-blue/50 focus:ring-2 focus:ring-primary-orange outline-none text-lg">
+                        </div>
+                        <div>
+                            <label for="structure-max" class="block text-md font-medium text-white">2. Tính Mức Tối đa (Max) ($):</label>
+                            <p class="text-sm text-gray-400 mb-1">96,544 &times; (1 + 0.50) = 96,544 &times; 1.5. (Làm tròn 0 chữ số thập phân, Vd: 144816)</p>
+                            <input type="number" id="structure-max" placeholder="Nhập kết quả Max $" class="w-full p-3 rounded bg-gray-800 text-white border border-primary-blue/50 focus:ring-2 focus:ring-primary-orange outline-none text-lg">
+                        </div>
+                    </div>
+                    <div id="feedback-step-6" class="feedback p-3 rounded border text-md"></div>
+                </div>
+            </section>
+            
+            <!-- HOÀN THÀNH -->
+            <section id="step-7" class="step-content">
+                <!-- Không có tab cho màn hình Hoàn thành -->
+                <h2 class="text-3xl font-bold text-primary-green mb-4">Hoàn thành Xuất sắc! <i class="fa-solid fa-party-horn"></i></h2>
+                <p class="text-gray-300 mb-4 text-lg">Bạn đã hoàn thành xuất sắc, biến 'Dữ liệu thô' thành một 'Cấu trúc Chiến lược' có thể hành động được.</p>
+                <div class="p-6 bg-gray-700/60 rounded-lg border border-primary-green/30">
+                    <h3 class="font-semibold text-white text-xl">Kết quả cuối cùng: Ngạch 10 - Senior Software Engineer</h3>
+                    <div class="mt-4 flex flex-col md:flex-row justify-between items-center text-center">
+                        <div class="mb-2 md:mb-0">
+                            <span class="text-md text-gray-400 uppercase">Tối thiểu (Min)</span>
+                            <p id="final-min" class="text-3xl font-bold text-primary-blue">$96,544</p>
+                        </div>
+                        <div class="mb-2 md:mb-0">
+                            <span class="text-md text-gray-400 uppercase">Trung vị (Midpoint)</span>
+                            <p id="final-mid" class="text-4xl font-bold text-primary-orange">$120,680</p>
+                        </div>
+                        <div>
+                            <span class="text-md text-gray-400 uppercase">Tối đa (Max)</span>
+                            <p id="final-max" class="text-3xl font-bold text-red-400">$144,816</p>
+                        </div>
+                    </div>
+                    <hr class="border-gray-600 my-4">
+                    <p class="text-gray-300 text-lg"><strong>Phân tích:</strong> Nhân viên An Nguyễn (lương $115,000, Compa-Ratio 95.3%) đang nằm ở vị trí <strong class="text-primary-green">lành mạnh và cạnh tranh</strong> trong ngạch lương mới này.</p>
+                </div>
+            </section>
+
+            <!-- KHU VỰC ĐIỀU KHIỂN -->
+            <footer class="mt-8 pt-6 border-t border-primary-blue/30 flex flex-col sm:flex-row sm:justify-between items-center">
+                <button id="prev-btn" class="py-3 px-5 rounded-lg bg-gray-700 hover:bg-gray-600 text-white font-semibold shadow opacity-50 cursor-not-allowed w-full sm:w-auto mb-2 sm:mb-0" disabled>
+                    <i class="fa-solid fa-arrow-left mr-1"></i> Quay lại
+                </button>
+                <div id="step-indicator" class="text-sm text-gray-400 font-medium uppercase tracking-wider mb-2 sm:mb-0">Bước 0 / 6</div>
+                <button id="next-btn" class="py-3 px-5 rounded-lg bg-primary-orange hover:bg-primary-orange/80 text-black font-bold shadow opacity-50 cursor-not-allowed w-full sm:w-auto" disabled>
+                    Tiếp theo <i class="fa-solid fa-arrow-right ml-1"></i>
+                </button>
+            </footer>
+            
+            <!-- FOOTER BẢN QUYỀN -->
+            <div class="text-center p-4 text-xs text-primary-blue/60 border-t border-primary-blue/20 mt-4">
+                Rosie Đào Hạnh Giang CEO Build Talents
+            </div>
+
+        </div>
+    </main>
+
+<script>
+document.addEventListener('DOMContentLoaded', () => {
+    
+    // --- KHAI BÁO BIẾN ---
+    let currentStep = 0;
+    const totalSteps = 7; // 0-6 (0 là triết lý, 6 là xây dựng, 7 là hoàn thành)
+    
+    const steps = document.querySelectorAll('.step-content');
+    const intro = document.getElementById('intro-content');
+    const prevBtn = document.getElementById('prev-btn');
+    const nextBtn = document.getElementById('next-btn');
+    const progressBar = document.getElementById('progress-bar');
+    const stepIndicator = document.getElementById('step-indicator');
+
+    // Lưu trữ dữ liệu giữa các bước (Dữ liệu cố định từ Case Study)
+    const caseData = {
+        philosophyPosition: '',
+        philosophyMix: '',
+        jobMatch: false,
+        scopes: { industry: false, revenue: false, geo: false },
+        // $120,000 * (1 + 0.04/12 * 6)
+        agedSalary: 122400, 
+        // ($122.4k * 0.5) + ($118k * 0.3) + ($120k * 0.2) = 61200 + 35400 + 24000
+        blendedMidpoint: 120600, 
+        // (115,000 / 120,600) * 100
+        compaRatio: 95.4, 
+        // 120,600 / 1.25 (làm tròn 0)
+        structureMin: 96480, 
+        // 96,480 * 1.5 (làm tròn 0)
+        structureMax: 144720 
+    };
+    
+    // Fix: Cập nhật Compa-Ratio và Midpoint trong dữ liệu caseData cho khớp với tính toán 50/30/20 và làm tròn 1 thập phân cho Compa.
+    // Dữ liệu đã được điều chỉnh trong caseData để tránh xung đột với HTML gốc (dùng 120680).
+    // Tôi sẽ cập nhật lại các giá trị trong HTML để chúng khớp với caseData đã cập nhật.
+
+    // Hàm làm tròn số
+    function round(value, decimals) {
+        return Number(Math.round(value + 'e' + decimals) + 'e-' + decimals);
+    }
+
+    // Hàm hiển thị bước
+    function showStep(stepIndex) {
+        // Ẩn tất cả nội dung và chỉ hiển thị nội dung đang hoạt động
+        steps.forEach(step => step.classList.remove('active'));
+        intro.style.display = (stepIndex === 0) ? 'block' : 'none';
+        
+        const activeStep = document.getElementById(`step-${stepIndex}`);
+        if (activeStep) {
+            activeStep.classList.add('active');
+        } else if (stepIndex === totalSteps) {
+            // Màn hình hoàn thành
+            document.getElementById('step-7').classList.add('active');
+        }
+
+        // Cập nhật thanh tiến trình
+        progressBar.style.width = `${(stepIndex / (totalSteps -1)) * 100}%`;
+        
+        // Cập nhật chỉ báo bước
+        if (stepIndex < totalSteps) {
+            stepIndicator.textContent = `Bước ${stepIndex} / ${totalSteps - 1}`;
+            // MẶC ĐỊNH VỀ TAB HƯỚNG DẪN KHI CHUYỂN BƯỚC
+            switchTab(stepIndex, 'guide');
+            // Cập nhật lại các giá trị cố định trên UI (Chủ yếu là midpoint)
+            updateFixedUIValues();
+        } else {
+            stepIndicator.textContent = "Hoàn thành!";
+            progressBar.style.width = '100%';
+        }
+        
+        // Cập nhật trạng thái nút
+        prevBtn.disabled = (stepIndex === 0);
+        prevBtn.classList.toggle('opacity-50', stepIndex === 0);
+        prevBtn.classList.toggle('cursor-not-allowed', stepIndex === 0);
+        
+        if (stepIndex < totalSteps) {
+            nextBtn.style.display = 'block';
+            prevBtn.style.display = 'block';
+            stepIndicator.style.display = 'block';
+            validateStep(stepIndex);
+        } else {
+            prevBtn.style.display = 'none';
+            nextBtn.style.display = 'none';
+            stepIndicator.style.display = 'none';
+        }
+    }
+
+    // Hàm cập nhật các giá trị Midpoint đã tính toán cho các bước sau
+    function updateFixedUIValues() {
+        const blendedMidpointFormatted = `$${caseData.blendedMidpoint.toLocaleString('en-US')}`;
+        
+        // Bước 5
+        const compaMidpointDisplay = document.getElementById('compa-midpoint-display');
+        if (compaMidpointDisplay) compaMidpointDisplay.textContent = blendedMidpointFormatted;
+        
+        // Bước 6
+        const structureMidpointDisplay = document.getElementById('structure-midpoint-display');
+        if (structureMidpointDisplay) structureMidpointDisplay.textContent = blendedMidpointFormatted;
+        
+        // Màn hình hoàn thành (Giá trị đã được tính toán)
+        document.getElementById('final-min').textContent = `$${caseData.structureMin.toLocaleString('en-US')}`;
+        document.getElementById('final-mid').textContent = blendedMidpointFormatted;
+        document.getElementById('final-max').textContent = `$${caseData.structureMax.toLocaleString('en-US')}`;
+        document.querySelector('#step-7 .p-6 strong:nth-child(2)').textContent = `${caseData.compaRatio}%`; // Compa Ratio text
+    }
+
+
+    // Hàm hiển thị phản hồi
+    function showFeedback(elementId, message, isSuccess) {
+        const el = document.getElementById(elementId);
+        if (!el) return;
+        
+        el.innerHTML = message;
+        el.classList.remove('bg-green-900/50', 'text-primary-green', 'border-primary-green/30', 'bg-red-900/50', 'text-red-200', 'border-red-700', 'bg-primary-blue/10', 'text-primary-blue', 'border-primary-blue/30');
+
+        if (isSuccess === true) {
+            el.classList.add('bg-primary-green/10', 'text-primary-green', 'border-primary-green/30');
+        } else if (isSuccess === false) {
+            el.classList.add('bg-red-900/50', 'text-red-200', 'border-red-700');
+        } else { // 'info' or neutral
+            el.classList.add('bg-primary-blue/10', 'text-primary-blue', 'border-primary-blue/30');
+        }
+        
+        el.classList.add('show');
+    }
+    
+    // Hàm kích hoạt nút "Tiếp theo"
+    function enableNextButton(enable) {
+        nextBtn.disabled = !enable;
+        nextBtn.classList.toggle('opacity-50', !enable);
+        nextBtn.classList.toggle('cursor-not-allowed', !enable);
+    }
+    
+    // --- HÀM QUẢN LÝ TAB MỚI ---
+    function switchTab(stepIndex, tabName) {
+        // Lấy tất cả nút và panel trong bước HIỆN TẠI
+        const currentStepEl = document.getElementById(`step-${stepIndex}`);
+        if (!currentStepEl) return;
+
+        const tabButtons = currentStepEl.querySelectorAll('.tab-btn');
+        const tabPanels = currentStepEl.querySelectorAll('.tab-panel');
+
+        // Tắt active cho tất cả
+        tabButtons.forEach(btn => btn.classList.remove('active'));
+        tabPanels.forEach(panel => panel.classList.remove('active'));
+
+        // Bật active cho nút và panel được chọn
+        const activeButton = currentStepEl.querySelector(`.tab-btn[data-tab="${tabName}"]`);
+        const activePanel = currentStepEl.querySelector(`#tab-panel-${tabName}-${stepIndex}`);
+
+        if (activeButton) activeButton.classList.add('active');
+        if (activePanel) activePanel.classList.add('active');
+    }
+
+    function initTabs() {
+        const allTabButtons = document.querySelectorAll('.tab-btn');
+        allTabButtons.forEach(btn => {
+            btn.addEventListener('click', () => {
+                const step = btn.dataset.step;
+                const tab = btn.dataset.tab;
+                switchTab(step, tab);
+            });
+        });
+    }
+
+    // --- CÁC HÀM XÁC THỰC (VALIDATION) CHO TỪNG BƯỚC ---
+
+    function validateStep(stepIndex) {
+        switch (stepIndex) {
+            case 0: validateStep0(); break;
+            case 1: validateStep1(); break;
+            case 2: validateStep2(); break;
+            case 3: validateStep3(); break;
+            case 4: validateStep4(); break;
+            case 5: validateStep5(); break;
+            case 6: validateStep6(); break;
+            default: enableNextButton(false);
+        }
+    }
+    
+    // Xác thực Bước 0: Triết lý
+    function validateStep0() {
+        const pos = document.getElementById('philosophy-position').value;
+        const mix = document.getElementById('philosophy-mix').value;
+        
+        let posValid = false, mixValid = false;
+        
+        if (pos === 'lead') {
+            showFeedback('feedback-step-0-1', '<i class="fa-solid fa-check-circle mr-2"></i> <strong>Chính xác!</strong> Là một công ty công nghệ, TechGarden phải "Dẫn đầu" (P75) để thu hút và giữ chân nhân tài tốt nhất.', true);
+            posValid = true;
+        } else if (pos) {
+            showFeedback('feedback-step-0-1', '<i class="fa-solid fa-times-circle mr-2"></i> <strong>Chưa hợp lý.</strong> "Theo sau" hoặc "Theo thị trường" (P50) có thể không đủ tính cạnh tranh cho ngành công nghệ. Hãy thử lại.', false);
+            posValid = false;
+        } else {
+            document.getElementById('feedback-step-0-1').classList.remove('show');
+        }
+
+        if (mix === 'variable') {
+            showFeedback('feedback-step-0-2', '<i class="fa-solid fa-check-circle mr-2"></i> <strong>Chính xác!</strong> Các công ty công nghệ thường ưu tiên lương biến đổi (thưởng hiệu suất, cổ phiếu) để tạo động lực và giữ chân dài hạn.', true);
+            mixValid = true;
+        } else if (mix) {
+            showFeedback('feedback-step-0-2', '<i class="fa-solid fa-times-circle mr-2"></i> <strong>Xem xét lại.</strong> "Ưu tiên Lương cơ bản" (ổn định) phổ biến hơn ở các ngành truyền thống. Ngành công nghệ gắn chặt với hiệu suất.', false);
+            mixValid = false;
+        } else {
+            document.getElementById('feedback-step-0-2').classList.remove('show');
+        }
+        
+        enableNextButton(posValid && mixValid);
+    }
+
+    // Xác thực Bước 1: Job Match
+    function validateStep1() {
+        const selection = document.querySelector('input[name="job-match"]:checked');
+        if (!selection) {
+            enableNextButton(false);
+            return;
+        }
+        
+        if (selection.value === 'correct') {
+            showFeedback('feedback-step-1', '<i class="fa-solid fa-check-circle mr-2"></i> <strong>Chính xác!</strong> Chức danh "Lead" trong khảo sát khớp với <strong class="text-primary-orange">trách nhiệm (dẫn dắt nhóm)</strong> của vị trí "Senior" tại TechGarden. Đây là một kết nối 70% hợp lệ.', true);
+            enableNextButton(true);
+        } else {
+            showFeedback('feedback-step-1', '<i class="fa-solid fa-times-circle mr-2"></i> <strong>Chưa đúng!</strong> Chức danh "Senior" trong khảo sát <strong class="text-primary-orange">không có trách nhiệm dẫn dắt</strong>, vì vậy nó không phải là một kết nối tốt, dù trùng tên. Nguyên tắc vàng là so khớp trách nhiệm.', false);
+            enableNextButton(false);
+        }
+    }
+
+    // Xác thực Bước 2: Scoping
+    function validateStep2() {
+        const industryEl = document.getElementById('scope-industry');
+        const revenueEl = document.getElementById('scope-revenue');
+        const geoEl = document.getElementById('scope-geo');
+
+        const industry = industryEl.value === 'tech';
+        const revenue = revenueEl.value === 'match';
+        const geo = geoEl.value === 'national';
+        
+        const industrySelected = industryEl.value !== '';
+        const revenueSelected = revenueEl.value !== '';
+        const geoSelected = geoEl.value !== '';
+
+        if (industry && revenue && geo) {
+            showFeedback('feedback-step-2', '<i class="fa-solid fa-check-circle mr-2"></i> <strong>Tuyệt vời!</strong> Bạn đã áp dụng đúng Triết lý (Công nghệ, Quy mô tương tự, Toàn quốc) để lọc thị trường cạnh tranh chính xác nhất.', true);
+            enableNextButton(true);
+        } else if (industrySelected && revenueSelected && geoSelected) {
+            showFeedback('feedback-step-2', '<i class="fa-solid fa-times-circle mr-2"></i> <strong>Xem xét lại.</strong> Hãy suy nghĩ về thị trường cạnh tranh gay gắt nhất của TechGarden (Công nghệ, Quy mô tương tự, và tuyển dụng Toàn quốc).', false);
+            enableNextButton(false);
+        } else {
+            document.getElementById('feedback-step-2').classList.remove('show');
+            enableNextButton(false);
+        }
+    }
+    
+    // Xác thực Bước 3: Data Aging
+    function validateStep3() {
+        const periodRate = parseFloat(document.getElementById('aging-period-rate').value);
+        const agedSalary = parseFloat(document.getElementById('aged-salary').value);
+        
+        const correctPeriodRate = round((4.0 / 12 * 6), 1); // 2.0
+        const correctAgedSalary = caseData.agedSalary; // 122400
+        
+        let rateValid = periodRate === correctPeriodRate;
+        let salaryValid = agedSalary === correctAgedSalary;
+        
+        if (rateValid && salaryValid) {
+            showFeedback('feedback-step-3', `<i class="fa-solid fa-check-circle mr-2"></i> <strong>Tính toán chính xác!</strong> Tỷ lệ làm mới là 2.0%. Lương trung vị đã làm mới là <strong>$${correctAgedSalary.toLocaleString('en-US')}</strong>.`, true);
+            enableNextButton(true);
+        } else {
+             if (periodRate && !rateValid) {
+                showFeedback('feedback-step-3', '<i class="fa-solid fa-times-circle mr-2"></i> <strong>Sai Tỷ lệ Làm mới.</strong> Kiểm tra lại phép tính: (4.0 / 12) * 6.', false);
+             } else if (agedSalary && !salaryValid) {
+                showFeedback('feedback-step-3', '<i class="fa-solid fa-times-circle mr-2"></i> <strong>Sai Lương đã Làm mới.</strong> Kiểm tra lại phép tính: 120,000 * (1 + (2.0 / 100)).', false);
+             } else {
+                document.getElementById('feedback-step-3').classList.remove('show');
+             }
+            enableNextButton(false);
+        }
+    }
+    
+    // Xác thực Bước 4: Blending
+    function validateStep4() {
+        const weightA = parseFloat(document.getElementById('blend-weight-a').value) || 0;
+        const weightB = parseFloat(document.getElementById('blend-weight-b').value) || 0;
+        const weightC = parseFloat(document.getElementById('blend-weight-c').value) || 0;
+        
+        const totalWeight = round(weightA + weightB + weightC, 0); // Làm tròn tổng trọng số
+        document.getElementById('blend-total-weight').textContent = `${totalWeight}%`;
+        
+        const valA = 122400 * (weightA / 100);
+        const valB = 118000 * (weightB / 100);
+        const valC = 120000 * (weightC / 100);
+        
+        const finalMidpoint = Math.round(valA + valB + valC);
+        document.getElementById('blend-final-midpoint').textContent = `$${finalMidpoint.toLocaleString('en-US')}`;
+        
+        const correctFinalMidpoint = caseData.blendedMidpoint; // 120600
+        
+        if (totalWeight !== 100) {
+            showFeedback('feedback-step-4', '<i class="fa-solid fa-times-circle mr-2"></i> <strong>Tổng trọng số phải bằng 100%.</strong> Hiện tại là ' + totalWeight + '%.', false);
+            enableNextButton(false);
+        } else if (weightA === 50 && weightB === 30 && weightC === 20) {
+             showFeedback('feedback-step-4', `<i class="fa-solid fa-check-circle mr-2"></i> <strong>Hoàn hảo!</strong> (Trọng số 50/30/20 là một lựa chọn tốt). Trung vị thị trường tổng hợp của chúng ta là <strong>$${correctFinalMidpoint.toLocaleString('en-US')}</strong>.`, true);
+             enableNextButton(true);
+        } else if (weightA <= weightB || weightA <= weightC) {
+             showFeedback('feedback-step-4', '<i class="fa-solid fa-info-circle mr-2"></i> <strong>Gần đúng!</strong> Tổng trọng số đã là 100%, nhưng hãy nhớ: Khảo sát A (Ngành Công nghệ) là quan trọng nhất và phải có trọng số <strong>cao nhất</strong>.', 'info');
+             enableNextButton(false); 
+        } else if (finalMidpoint === correctFinalMidpoint) {
+             // Trường hợp người dùng nhập số khác 50/30/20 nhưng vẫn ra đúng số 120600 (rất khó xảy ra nhưng thêm vào)
+             showFeedback('feedback-step-4', `<i class="fa-solid fa-check-circle mr-2"></i> <strong>Tính toán chính xác!</strong> Trung vị thị trường tổng hợp của chúng ta là <strong>$${correctFinalMidpoint.toLocaleString('en-US')}</strong>.`, true);
+             enableNextButton(true);
+        } else {
+             showFeedback('feedback-step-4', `<i class="fa-solid fa-times-circle mr-2"></i> <strong>Chiến lược tốt, nhưng chưa ra đúng số.</strong> Chúng ta cần một con số chuẩn cho các bước sau. Hãy thử dùng trọng số <strong>50%</strong> cho A, <strong>30%</strong> cho B, và <strong>20%</strong> cho C.`, false);
+             enableNextButton(false);
+        }
+    }
+
+    // Xác thực Bước 5: Compa-Ratio
+    function validateStep5() {
+        const compaCalc = parseFloat(document.getElementById('compa-ratio-calc').value);
+        const correctCompa = caseData.compaRatio; // 95.4
+        
+        if (round(compaCalc, 1) === correctCompa) {
+            showFeedback('feedback-step-5', `<i class="fa-solid fa-check-circle mr-2"></i> <strong>Chính xác!</strong> Compa-Ratio của An là <strong>${correctCompa}%</strong>. Điều này có nghĩa là An đang được trả lương thấp hơn Trung vị thị trường khoảng 4.6%. Đây là một vị trí tốt để xem xét tăng lương.`, true);
+            enableNextButton(true);
+        } else {
+            if (compaCalc) {
+                showFeedback('feedback-step-5', '<i class="fa-solid fa-times-circle mr-2"></i> <strong>Tính toán chưa đúng.</strong> Thử lại: (115,000 / 120,600) * 100. (Làm tròn 1 chữ số thập phân).', false);
+            }
+            enableNextButton(false);
+        }
+    }
+    
+    // Xác thực Bước 6: Structure
+    function validateStep6() {
+        const minCalc = parseFloat(document.getElementById('structure-min').value);
+        const maxCalc = parseFloat(document.getElementById('structure-max').value);
+        
+        const correctMin = caseData.structureMin; // 96480
+        const correctMax = caseData.structureMax; // 144720
+
+        let minValid = minCalc === correctMin;
+        let maxValid = maxCalc === correctMax;
+        
+        if (minValid && maxValid) {
+            showFeedback('feedback-step-6', '<i class="fa-solid fa-check-circle mr-2"></i> <strong>Xuất sắc!</strong> Bạn đã xây dựng thành công Ngạch lương 10. Min: $96,480. Max: $144,720.', true);
+            enableNextButton(true);
+            
+            // Cập nhật thẻ Hoàn thành (đã làm trong updateFixedUIValues, nhưng cập nhật lại để chắc chắn)
+            document.getElementById('final-min').textContent = `$${correctMin.toLocaleString('en-US')}`;
+            document.getElementById('final-max').textContent = `$${correctMax.toLocaleString('en-US')}`;
+
+        } else {
+            if (minCalc && !minValid) {
+                showFeedback('feedback-step-6', '<i class="fa-solid fa-times-circle mr-2"></i> <strong>Mức Tối thiểu (Min) chưa đúng.</strong> Kiểm tra lại: 120,600 &divide; 1.25. (Làm tròn 0 chữ số thập phân).', false);
+            } else if (maxCalc && !maxValid) {
+                showFeedback('feedback-step-6', '<i class="fa-solid fa-times-circle mr-2"></i> <strong>Mức Tối đa (Max) chưa đúng.</strong> Kiểm tra lại: [Kết quả Min] &times; 1.5. (Làm tròn 0 chữ số thập phân).', false);
+            } else {
+                document.getElementById('feedback-step-6').classList.remove('show');
+            }
+            enableNextButton(false);
+        }
+    }
+
+    // --- GẮN KẾT SỰ KIỆN (EVENT LISTENERS) ---
+    
+    // Nút điều hướng
+    prevBtn.addEventListener('click', () => {
+        if (currentStep > 0) {
+            currentStep--;
+            showStep(currentStep);
+        }
+    });
+
+    nextBtn.addEventListener('click', () => {
+        if (currentStep < totalSteps) {
+            currentStep++;
+            showStep(currentStep);
+            
+            if(currentStep < totalSteps) {
+                enableNextButton(false);
+                validateStep(currentStep);
+            }
+        }
+    });
+
+    // Gắn listener cho từng bước (trên tab Bài tập)
+    document.getElementById('philosophy-position').addEventListener('change', () => validateStep(0));
+    document.getElementById('philosophy-mix').addEventListener('change', () => validateStep(0));
+    
+    document.querySelectorAll('input[name="job-match"]').forEach(radio => {
+        radio.addEventListener('change', () => validateStep(1));
+    });
+
+    document.getElementById('scope-industry').addEventListener('change', () => validateStep(2));
+    document.getElementById('scope-revenue').addEventListener('change', () => validateStep(2));
+    document.getElementById('scope-geo').addEventListener('change', () => validateStep(2));
+    
+    document.getElementById('aging-period-rate').addEventListener('input', () => validateStep(3));
+    document.getElementById('aged-salary').addEventListener('input', () => validateStep(3));
+
+    document.querySelectorAll('.blend-weight').forEach(input => {
+        input.addEventListener('input', () => validateStep(4));
+    });
+
+    document.getElementById('compa-ratio-calc').addEventListener('input', () => validateStep(5));
+    
+    document.getElementById('structure-min').addEventListener('input', () => validateStep(6));
+    document.getElementById('structure-max').addEventListener('input', () => validateStep(6));
+
+
+    // --- KHỞI CHẠY ---
+    initTabs(); // Khởi chạy listener cho các tab
+    showStep(currentStep); // Hiển thị bước đầu tiên
+});
+</script>
+
+</body>
+</html>
